@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+    <title>Agregar Solicitud</title>
+</head>
+<body class="p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-2xl font-bold mb-6">Agregar Solicitud</h1>
+
+        <form id="formSolicitud" class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-base-100 p-6 rounded-box shadow">
+
+            <input class="input input-bordered w-full" id="cliente_id" type="number" placeholder="Cliente ID" required>
+            <input class="input input-bordered w-full" id="servicio_id" type="number" placeholder="Servicio ID" required>
+            <input class="input input-bordered w-full" id="folio" type="text" placeholder="Folio" required>
+            <input class="input input-bordered w-full" id="titulo" type="text" placeholder="Título" required>
+            <input class="input input-bordered w-full" id="descripcion" type="text" placeholder="Descripción">
+            <input class="input input-bordered w-full" id="direccion" type="text" placeholder="Dirección">
+            <input class="input input-bordered w-full" id="colonia" type="text" placeholder="Colonia">
+            <input class="input input-bordered w-full" id="ciudad" type="text" placeholder="Ciudad">
+            <input class="input input-bordered w-full" id="estado_region" type="text" placeholder="Estado / Región">
+            <input class="input input-bordered w-full" id="codigo_postal" type="text" placeholder="Código postal">
+            <input class="input input-bordered w-full" id="fecha_preferida" type="date">
+            <input class="input input-bordered w-full" id="hora_preferida" type="time">
+            <input class="input input-bordered w-full" id="urgencia" type="text" placeholder="Urgencia">
+            <input class="input input-bordered w-full" id="estado" type="text" placeholder="Estado">
+
+            <div class="md:col-span-2 flex gap-2 justify-end mt-2">
+                <a href="index.html" class="btn">Cancelar</a>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="../js/agregar_solicitud.js"></script>
+</body>
+</html>
