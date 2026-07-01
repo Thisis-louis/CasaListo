@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+    <title>Cotizaciones - Casa Listo</title>
+</head>
+<body class="p-8 bg-base-200 min-h-screen">
+    <div class="max-w-6xl mx-auto space-y-6">
+        
+        <div class="card bg-base-100 shadow-xl p-6">
+            <h2 id="form-title" class="text-xl font-bold mb-4 text-primary">📝 Registrar Nueva Cotización</h2>
+            <form id="form-quote" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
+                <input type="hidden" id="id" value="">
+
+                <label class="form-control w-full">
+                    <div class="label"><span class="label-text font-semibold">ID Servicio</span></div>
+                    <input type="number" id="servicio_id" class="input input-bordered w-full" required placeholder="Ej: 1">
+                </label>
+
+                <label class="form-control w-full">
+                    <div class="label"><span class="label-text font-semibold">Monto Estimado ($)</span></div>
+                    <input type="number" step="0.01" id="monto_estimado" class="input input-bordered w-full" required placeholder="0.00">
+                </label>
+
+                <label class="form-control w-full lg:col-span-3">
+                    <div class="label"><span class="label-text font-semibold">Descripción del Trabajo</span></div>
+                    <input type="text" id="descripcion" class="input input-bordered w-full" required placeholder="Ej: Reparación e impermeabilización de techos">
+                </label>
+
+                <div class="md:col-span-2 lg:col-span-3 flex gap-2 justify-end mt-2">
+                    <button type="button" id="btn-cancel" class="btn btn-ghost hidden">Cancelar</button>
+                    <button type="submit" id="btn-submit" class="btn btn-primary">Guardar Cotización</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card bg-base-100 shadow-xl overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="table table-zebra w-full">
+                    <thead>
+                        <tr class="bg-base-300">
+                            <th>ID</th>
+                            <th>Servicio ID</th>
+                            <th>Descripción</th>
+                            <th>Monto Estimado</th>
+                            <th>Estado</th>
+                            <th>Fecha Creación</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/quotes.js"></script>
+</body>
+</html>
