@@ -27,7 +27,7 @@
   padding: 48px;
   background:
     linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.86)),
-    url("../img/logo-casalisto.png") center 68% / 78% no-repeat;
+    url("../img/Logo.png") center 68% / 78% no-repeat;
 }
 
 .auth-brand h1 {
@@ -70,6 +70,17 @@
   font-weight: 800;
 }
 
+.auth-field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.auth-help a {
+  color: var(--cl-orange-600);
+  font-weight: 900;
+}
+
 .auth-alert {
   padding: 12px 14px;
   border: 1px solid rgba(220, 38, 38, 0.22);
@@ -77,6 +88,15 @@
   background: #fff1f1;
   color: var(--cl-danger);
   font-weight: 700;
+}
+
+.auth-success {
+  padding: 12px 14px;
+  border: 1px solid rgba(22, 163, 74, 0.22);
+  border-radius: var(--cl-radius);
+  background: #ecfdf3;
+  color: var(--cl-success);
+  font-weight: 800;
 }
 
 .auth-help {
@@ -152,9 +172,72 @@
   line-height: 1;
 }
 
+.dashboard-modules {
+  margin-top: 42px;
+}
+
+.dashboard-title h2 {
+  margin: 0;
+  color: var(--cl-blue-900);
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+}
+
+.dashboard-module-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.module-link {
+  display: grid;
+  gap: 8px;
+  min-height: 92px;
+  padding: 18px;
+  border: 1px solid var(--cl-border);
+  border-radius: var(--cl-radius);
+  background: var(--cl-white);
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.module-link:hover {
+  border-color: rgba(248, 96, 16, 0.38);
+  box-shadow: var(--cl-shadow);
+  transform: translateY(-2px);
+}
+
+.module-link span {
+  color: var(--cl-blue-900);
+  font-weight: 900;
+}
+
+.module-link strong {
+  color: var(--cl-gray-700);
+  font-size: 0.86rem;
+}
+
+.admin-form-card {
+  display: grid;
+  gap: 18px;
+  max-width: 860px;
+  padding: 26px;
+  border: 1px solid var(--cl-border);
+  border-radius: var(--cl-radius);
+  background: var(--cl-white);
+  box-shadow: var(--cl-shadow);
+}
+
+.admin-form-card label {
+  display: grid;
+  gap: 8px;
+  color: var(--cl-blue-800);
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
 @media (max-width: 840px) {
   .auth-shell,
-  .dashboard-grid {
+  .dashboard-grid,
+  .dashboard-module-grid {
     grid-template-columns: 1fr;
   }
 
@@ -165,6 +248,10 @@
 
   .auth-card {
     padding: 32px;
+  }
+
+  .auth-field-grid {
+    grid-template-columns: 1fr;
   }
 }
 

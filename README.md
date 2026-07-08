@@ -7,7 +7,7 @@ CasaListo es una plataforma local de servicios para el hogar en Cancun y Riviera
 El logo principal del proyecto esta en:
 
 ```text
-assets/img/logo-casalisto.png
+assets/img/Logo.png
 ```
 
 La hoja base de estilos de marca esta en:
@@ -120,3 +120,68 @@ Usuario administrador inicial para desarrollo local:
 - Contrasena: `CasaListo2026!`
 
 Este usuario debe cambiarse antes de usar el sistema en produccion.
+
+## Registro de usuarios
+
+Registro visible para clientes:
+
+```text
+auth/registro.php
+php/auth/registro_cliente.php
+```
+
+Este flujo siempre crea usuarios con rol `cliente` y los manda al panel de cliente.
+
+Creacion interna de usuarios:
+
+```text
+admin/crear-usuario.php
+php/auth/crear_usuario.php
+```
+
+Esta vista requiere sesion de `administrador`. Desde ahi se crean tecnicos, administradores u otros roles. Si el rol elegido es `tecnico`, tambien se crea el registro relacionado en la tabla `tecnicos`.
+
+## Modulos por tabla
+
+Cada tabla principal de la base de datos tiene una carpeta con su `index.html`:
+
+```text
+roles/
+usuarios/
+categorias/
+servicios/
+tecnicos/
+tecnicos_servicios/
+solicitudes/
+solicitud_archivos/
+cotizaciones/
+asignaciones/
+pagos/
+calificaciones/
+notificaciones/
+paginas_contenido/
+bitacora/
+```
+
+Cada modulo consume un endpoint PHP con el mismo nombre de la tabla:
+
+```text
+php/roles.php
+php/usuarios.php
+php/categorias.php
+...
+```
+
+La conexion y funciones reutilizables estan centralizadas en:
+
+```text
+php/db.php
+php/functions.php
+```
+
+La tabla visual de cada modulo se renderiza con:
+
+```text
+js/module-table.js
+assets/css/modules.css
+```

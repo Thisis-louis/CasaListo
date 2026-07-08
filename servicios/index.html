@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Servicios | CasaListo</title>
+    <link rel="icon" href="../assets/img/Logo.png">
+    <link rel="stylesheet" href="../assets/css/casalisto-theme.css">
+    <link rel="stylesheet" href="../assets/css/modules.css">
+</head>
+<body class="module-page" data-module="servicios" data-endpoint="../php/servicios.php">
+    <header class="module-header">
+        <div class="cl-container module-header__inner">
+            <a class="cl-brand" href="../index.php"><img class="cl-brand__logo" src="../assets/img/Logo.png" alt="CasaListo"><span class="cl-brand__name">Casa<span>Listo</span></span></a>
+            <nav class="module-nav"><a class="cl-button cl-button--ghost" href="../index.php">Inicio</a><a class="cl-button cl-button--secondary" href="../admin/dashboard.php">Admin</a></nav>
+        </div>
+    </header>
+    <main class="cl-container module-main">
+        <section class="module-title"><div><p class="cl-eyebrow">Módulo</p><h1 data-module-title>Servicios</h1><p>Registros actuales de la tabla servicios.</p></div><span class="cl-status" data-module-count>0 registros</span></section>
+        <section class="module-form-shell">
+            <div class="module-form-header">
+                <div>
+                    <p class="cl-eyebrow">Catálogo</p>
+                    <h2 data-service-form-title>Insertar servicio</h2>
+                </div>
+                <button class="cl-button cl-button--ghost" type="button" data-service-reset hidden>Nuevo</button>
+            </div>
+            <form class="module-form" data-service-form>
+                <input type="hidden" name="id">
+                <div class="module-field">
+                    <label for="categoria_id">Categoría</label>
+                    <select class="cl-select" id="categoria_id" name="categoria_id" required data-category-select>
+                        <option value="">Selecciona</option>
+                    </select>
+                </div>
+                <div class="module-field">
+                    <label for="nombre">Nombre</label>
+                    <input class="cl-input" id="nombre" name="nombre" maxlength="140" required>
+                </div>
+                <div class="module-field">
+                    <label for="slug">Slug</label>
+                    <input class="cl-input" id="slug" name="slug" maxlength="160">
+                </div>
+                <div class="module-field">
+                    <label for="precio_base">Precio base</label>
+                    <input class="cl-input" id="precio_base" name="precio_base" type="number" min="0" step="0.01">
+                </div>
+                <div class="module-field module-field--wide">
+                    <label for="descripcion">Descripción</label>
+                    <textarea class="cl-textarea" id="descripcion" name="descripcion"></textarea>
+                </div>
+                <div class="module-field">
+                    <label for="estado">Estado</label>
+                    <select class="cl-select" id="estado" name="estado">
+                        <option value="activo">Activo</option>
+                        <option value="inactivo">Inactivo</option>
+                    </select>
+                </div>
+                <label class="module-check"><input type="checkbox" name="requiere_cotizacion" checked> Requiere cotización</label>
+                <label class="module-check"><input type="checkbox" name="destacado"> Destacado</label>
+                <div class="module-form-actions">
+                    <button class="cl-button cl-button--primary" type="submit" data-service-submit>Insertar</button>
+                    <button class="cl-button cl-button--ghost" type="button" data-service-cancel hidden>Cancelar</button>
+                </div>
+                <div class="module-form-message" data-service-message hidden></div>
+            </form>
+        </section>
+        <section class="module-table-shell"><div class="module-loading" data-table-status>Cargando registros...</div><div class="module-table-scroll"><table class="module-table"><thead data-table-head></thead><tbody data-table-body></tbody></table></div></section>
+    </main>
+    <script src="../js/module-table.js"></script>
+</body>
+</html>

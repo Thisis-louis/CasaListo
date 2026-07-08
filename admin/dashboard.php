@@ -17,6 +17,24 @@ $metrics = [
     'Técnicos' => (int) db()->query('SELECT COUNT(*) FROM tecnicos')->fetchColumn(),
     'Servicios' => (int) db()->query('SELECT COUNT(*) FROM servicios')->fetchColumn(),
 ];
+
+$modules = [
+    'roles' => 'Roles',
+    'usuarios' => 'Usuarios',
+    'categorias' => 'Categorías',
+    'servicios' => 'Servicios',
+    'tecnicos' => 'Técnicos',
+    'tecnicos_servicios' => 'Técnicos y servicios',
+    'solicitudes' => 'Solicitudes',
+    'solicitud_archivos' => 'Archivos de solicitudes',
+    'cotizaciones' => 'Cotizaciones',
+    'asignaciones' => 'Asignaciones',
+    'pagos' => 'Pagos',
+    'calificaciones' => 'Calificaciones',
+    'notificaciones' => 'Notificaciones',
+    'paginas_contenido' => 'Contenido de páginas',
+    'bitacora' => 'Bitácora',
+];
 ?>
 <!doctype html>
 <html lang="es">
@@ -24,7 +42,7 @@ $metrics = [
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Admin | CasaListo</title>
-    <link rel="icon" href="../assets/img/logo-casalisto.png">
+    <link rel="icon" href="../assets/img/Logo.png">
     <link rel="stylesheet" href="../assets/css/casalisto-theme.css">
     <link rel="stylesheet" href="../assets/css/auth.css">
 </head>
@@ -33,10 +51,13 @@ $metrics = [
         <header class="dashboard-header">
             <div class="cl-container dashboard-header__inner">
                 <a class="cl-brand" href="../index.php">
-                    <img class="cl-brand__logo" src="../assets/img/logo-casalisto.png" alt="CasaListo">
+                    <img class="cl-brand__logo" src="../assets/img/Logo.png" alt="CasaListo">
                     <span class="cl-brand__name">Casa<span>Listo</span></span>
                 </a>
-                <a class="cl-button cl-button--ghost" href="../auth/logout.php">Salir</a>
+                <nav class="module-nav">
+                    <a class="cl-button cl-button--secondary" href="crear-usuario.php">Crear usuario</a>
+                    <a class="cl-button cl-button--ghost" href="../auth/logout.php">Salir</a>
+                </nav>
             </div>
         </header>
 
@@ -57,6 +78,25 @@ $metrics = [
                         <strong><?= $value ?></strong>
                     </article>
                 <?php endforeach; ?>
+            </section>
+
+            <section class="dashboard-modules">
+                <div class="dashboard-title">
+                    <div>
+                        <p class="cl-eyebrow">Módulos por tabla</p>
+                        <h2>Administración de registros</h2>
+                        <p>Cada acceso abre el `index.html` del módulo correspondiente.</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-module-grid">
+                    <?php foreach ($modules as $folder => $label): ?>
+                        <a class="module-link" href="../<?= e($folder) ?>/">
+                            <span><?= e($label) ?></span>
+                            <strong><?= e($folder) ?></strong>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
             </section>
         </main>
     </div>

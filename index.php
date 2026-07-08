@@ -106,7 +106,7 @@ $ctaCopy = $content['cta_final']['contenido'] ?? 'Solicita un servicio y recibe 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>CasaListo | Servicios para el hogar en Cancún</title>
     <meta name="description" content="CasaListo conecta clientes con técnicos para mantenimiento, reparaciones y servicios residenciales en Cancún y Riviera Maya.">
-    <link rel="icon" href="assets/img/logo-casalisto.png">
+    <link rel="icon" href="assets/img/Logo.png">
     <link rel="stylesheet" href="assets/css/casalisto-theme.css">
     <link rel="stylesheet" href="assets/css/landing.css">
 </head>
@@ -115,7 +115,7 @@ $ctaCopy = $content['cta_final']['contenido'] ?? 'Solicita un servicio y recibe 
         <header class="cl-navbar">
             <div class="cl-container cl-navbar__inner">
                 <a class="cl-brand" href="#inicio" aria-label="CasaListo inicio">
-                    <img class="cl-brand__logo" src="assets/img/logo-casalisto.png" alt="CasaListo">
+                    <img class="cl-brand__logo" src="assets/img/Logo.png" alt="CasaListo">
                     <span class="cl-brand__name">Casa<span>Listo</span></span>
                 </a>
 
@@ -131,6 +131,7 @@ $ctaCopy = $content['cta_final']['contenido'] ?? 'Solicita un servicio y recibe 
                     <a href="#catalogo">Catálogo</a>
                     <a href="#contacto">Contacto</a>
                     <a href="auth/login.php">Ingresar</a>
+                    <a href="auth/registro.php">Crear cuenta</a>
                     <a class="cl-button cl-button--primary" href="#solicitar">Solicitar servicio</a>
                 </nav>
             </div>
@@ -167,7 +168,7 @@ $ctaCopy = $content['cta_final']['contenido'] ?? 'Solicita un servicio y recibe 
                     </div>
 
                     <aside class="hero-panel" aria-label="Resumen de solicitud">
-                        <img class="hero-panel__logo" src="assets/img/logo-casalisto.png" alt="">
+                        <img class="hero-panel__logo" src="assets/img/Logo.png" alt="">
                         <div class="hero-panel__body">
                             <span class="cl-status"><?= $dbReady ? 'Base conectada' : 'Modo respaldo' ?></span>
                             <h2>Llegamos, lo arreglamos, te olvidas.</h2>
@@ -313,7 +314,7 @@ $ctaCopy = $content['cta_final']['contenido'] ?? 'Solicita un servicio y recibe 
 
             <section class="cl-section cl-section--white" id="contacto">
                 <div class="cl-container final-cta">
-                    <img src="assets/img/logo-casalisto.png" alt="CasaListo">
+                    <img src="assets/img/Logo.png" alt="CasaListo">
                     <div>
                         <p class="cl-eyebrow">CasaListo</p>
                         <h2>Servicios confiables para mantener tu casa lista.</h2>
