@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+    <title>Solicitudes</title>
+</head>
+<body class="p-8">
+
+    <div class="flex justify-between items-center mb-4">
+        <h1 class="text-2xl font-bold">Solicitudes</h1>
+        <a href="agregar.html" class="btn btn-success">+ Agregar</a>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="table table-zebra w-full">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cliente ID</th>
+                    <th>Servicio ID</th>
+                    <th>Folio</th>
+                    <th>Título</th>
+                    <th>Descripción</th>
+                    <th>Dirección</th>
+                    <th>Colonia</th>
+                    <th>Ciudad</th>
+                    <th>Estado región</th>
+                    <th>Código postal</th>
+                    <th>Fecha preferida</th>
+                    <th>Hora preferida</th>
+                    <th>Urgencia</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+        </table>
+    </div>
+
+    <script src="../js/solicitudes.js"></script>
+</body>
+</html>
