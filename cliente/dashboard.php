@@ -17,7 +17,7 @@ $user = requireAuth(['cliente']);
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Cliente | CasaListo</title>
-    <link rel="icon" href="../assets/img/logo-casalisto.png">
+    <link rel="icon" href="../assets/img/Logo.png">
     <link rel="stylesheet" href="../assets/css/casalisto-theme.css">
     <link rel="stylesheet" href="../assets/css/auth.css">
 </head>
@@ -26,7 +26,7 @@ $user = requireAuth(['cliente']);
         <header class="dashboard-header">
             <div class="cl-container dashboard-header__inner">
                 <a class="cl-brand" href="../index.php">
-                    <img class="cl-brand__logo" src="../assets/img/logo-casalisto.png" alt="CasaListo">
+                    <img class="cl-brand__logo" src="../assets/img/Logo.png" alt="CasaListo">
                     <span class="cl-brand__name">Casa<span>Listo</span></span>
                 </a>
                 <a class="cl-button cl-button--ghost" href="../auth/logout.php">Salir</a>

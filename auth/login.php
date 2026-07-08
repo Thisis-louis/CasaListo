@@ -31,7 +31,7 @@ $message = $messages[$error] ?? '';
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Ingresar | CasaListo</title>
-    <link rel="icon" href="../assets/img/logo-casalisto.png">
+    <link rel="icon" href="../assets/img/Logo.png">
     <link rel="stylesheet" href="../assets/css/casalisto-theme.css">
     <link rel="stylesheet" href="../assets/css/auth.css">
 </head>
@@ -40,7 +40,7 @@ $message = $messages[$error] ?? '';
         <section class="auth-shell">
             <div class="auth-brand">
                 <a class="cl-brand" href="../index.php">
-                    <img class="cl-brand__logo" src="../assets/img/logo-casalisto.png" alt="CasaListo">
+                    <img class="cl-brand__logo" src="../assets/img/Logo.png" alt="CasaListo">
                     <span class="cl-brand__name">Casa<span>Listo</span></span>
                 </a>
                 <h1>Acceso a la plataforma</h1>
@@ -71,6 +71,7 @@ $message = $messages[$error] ?? '';
 
                 <button class="cl-button cl-button--primary" type="submit">Entrar</button>
 
+                <p class="auth-help">¿Eres cliente nuevo? <a href="registro.php">Crea tu cuenta</a></p>
                 <p class="auth-help">Usuario inicial: <strong>admin@casalisto.local</strong></p>
             </form>
         </section>
