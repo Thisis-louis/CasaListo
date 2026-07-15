@@ -85,13 +85,13 @@ $modules = [
                     <div>
                         <p class="cl-eyebrow">Módulos por tabla</p>
                         <h2>Administración de registros</h2>
-                        <p>Cada acceso abre el `index.html` del módulo correspondiente.</p>
+                        <p>Cada acceso abre la SPA de administración del módulo correspondiente.</p>
                     </div>
                 </div>
 
                 <div class="dashboard-module-grid">
                     <?php foreach ($modules as $folder => $label): ?>
-                        <a class="module-link" href="../<?= e($folder) ?>/">
+                        <a class="module-link" href="modulos.php#/<?= e($folder) ?>">
                             <span><?= e($label) ?></span>
                             <strong><?= e($folder) ?></strong>
                         </a>

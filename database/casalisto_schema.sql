@@ -1,6 +1,3 @@
--- CasaListo - Esquema relacional inicial
--- Importar este archivo desde HeidiSQL o phpMyAdmin.
-
 CREATE DATABASE IF NOT EXISTS casalisto
   CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci;
