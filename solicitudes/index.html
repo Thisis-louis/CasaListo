@@ -70,13 +70,17 @@
 
                 <div class="module-form-grid">
                     <label class="module-field">
-                        <span>Cliente ID</span>
-                        <input type="number" id="cliente_id" name="cliente_id" min="1" step="1" required>
+                        <span>Cliente</span>
+                        <select id="cliente_id" name="cliente_id" required>
+                            <option value="">Seleccione un cliente</option>
+                        </select>
                     </label>
 
                     <label class="module-field">
-                        <span>Servicio ID</span>
-                        <input type="number" id="servicio_id" name="servicio_id" min="1" step="1" required>
+                        <span>Servicio</span>
+                        <select id="servicio_id" name="servicio_id" required>
+                            <option value="">Seleccione un servicio</option>
+                        </select>
                     </label>
 
                     <label class="module-field">
@@ -162,6 +166,6 @@
         </section>
     </main>
 
-    <script type="module" src="../js/solicitudes.js?v=5"></script>
+    <script type="module" src="../js/solicitudes.js?v=6"></script>
 </body>
 </html>

@@ -3,19 +3,38 @@ import {
     getOne,
     create,
     update,
-    deleteRecord
+    deleteRecord,
+    getClientes,
+    getServicios
 } from "./api_solicitudes.js";
 
 const state = {
     editingId: null,
-    columns: []
+    columns: [],
+    foreignKeysLoaded: false,
+    foreignKeysPromise: null
 };
 
 document.addEventListener("DOMContentLoaded", () => {
     showTable();
     bindEvents();
+    configurarFechaMinima();
     cargarSolicitudes();
 });
+
+function configurarFechaMinima() {
+    const fechaInput = document.getElementById("fecha_preferida");
+
+    if (!fechaInput) {
+        return;
+    }
+
+    const hoy = new Date();
+    hoy.setMinutes(hoy.getMinutes() - hoy.getTimezoneOffset());
+    const fechaMinima = hoy.toISOString().split("T")[0];
+
+    fechaInput.min = fechaMinima;
+}
 
 function bindEvents() {
     const addBtn = document.querySelector("[data-add-btn]");
@@ -24,7 +43,9 @@ function bindEvents() {
     const resetBtn = form?.querySelector('button[type="reset"]');
 
     if (addBtn) {
-        addBtn.addEventListener("click", openCreateMode);
+        addBtn.addEventListener("click", () => {
+            openCreateMode();
+        });
     }
 
     if (cancelBtn) {
@@ -73,7 +94,9 @@ async function cargarSolicitudes() {
 
         titleEl.textContent = json.title || "Solicitudes";
         countEl.textContent = `${records.length} registros`;
-        statusEl.textContent = records.length > 0 ? "Registros cargados correctamente." : "No hay registros para mostrar.";
+        statusEl.textContent = records.length > 0
+            ? "Registros cargados correctamente."
+            : "No hay registros para mostrar.";
 
         renderTable(thead, tbody, state.columns, records);
     } catch (error) {
@@ -142,7 +165,7 @@ function renderTable(thead, tbody, columns, records) {
         columns.forEach((column) => {
             const td = document.createElement("td");
             td.className = "px-5 py-4 text-gray-700 align-top";
-            td.textContent = formatValue(record?.[column]);
+            td.textContent = formatValue(record, column);
             row.appendChild(td);
         });
 
@@ -199,7 +222,21 @@ function formatHeader(column) {
     return labels[column] || column;
 }
 
-function formatValue(value) {
+function formatValue(record, column) {
+    if (!record) {
+        return "";
+    }
+
+    if (column === "cliente_id") {
+        return record.cliente_nombre ?? record.cliente_label ?? record.cliente_id ?? "";
+    }
+
+    if (column === "servicio_id") {
+        return record.servicio_nombre ?? record.servicio_label ?? record.servicio_id ?? "";
+    }
+
+    const value = record[column];
+
     if (value === null || value === undefined) {
         return "";
     }
@@ -237,6 +274,66 @@ function showForm() {
     }
 }
 
+async function loadForeignKeyOptions() {
+    if (state.foreignKeysLoaded) {
+        return;
+    }
+
+    if (!state.foreignKeysPromise) {
+        state.foreignKeysPromise = Promise.all([
+            getClientes(),
+            getServicios()
+        ])
+            .then(([clientesJson, serviciosJson]) => {
+                populateSelect(
+                    "cliente_id",
+                    Array.isArray(clientesJson.options) ? clientesJson.options : [],
+                    "Seleccione un cliente"
+                );
+
+                populateSelect(
+                    "servicio_id",
+                    Array.isArray(serviciosJson.options) ? serviciosJson.options : [],
+                    "Seleccione un servicio"
+                );
+
+                state.foreignKeysLoaded = true;
+            })
+            .finally(() => {
+                state.foreignKeysPromise = null;
+            });
+    }
+
+    return state.foreignKeysPromise;
+}
+
+function populateSelect(selectId, options, placeholder) {
+    const select = document.getElementById(selectId);
+
+    if (!select) {
+        return;
+    }
+
+    const currentValue = select.value;
+    select.innerHTML = "";
+
+    const defaultOption = document.createElement("option");
+    defaultOption.value = "";
+    defaultOption.textContent = placeholder;
+    select.appendChild(defaultOption);
+
+    options.forEach((option) => {
+        const opt = document.createElement("option");
+        opt.value = String(option.id ?? "");
+        opt.textContent = String(option.label ?? option.nombre ?? option.descripcion ?? option.id ?? "");
+        select.appendChild(opt);
+    });
+
+    if (currentValue) {
+        select.value = currentValue;
+    }
+}
+
 function resetFormDefaults() {
     const form = document.getElementById("solicitudForm");
 
@@ -249,39 +346,52 @@ function resetFormDefaults() {
         idInput.value = "";
     }
 
-    const clienteInput = document.getElementById("cliente_id");
-    const servicioInput = document.getElementById("servicio_id");
     const urgencia = document.getElementById("urgencia");
     const estado = document.getElementById("estado");
+    const cliente = document.getElementById("cliente_id");
+    const servicio = document.getElementById("servicio_id");
 
-    if (clienteInput) clienteInput.value = "";
-    if (servicioInput) servicioInput.value = "";
+    if (cliente) cliente.value = "";
+    if (servicio) servicio.value = "";
     if (urgencia) urgencia.value = "normal";
     if (estado) estado.value = "nueva";
 
     state.editingId = null;
 }
 
-function openCreateMode() {
-    resetFormDefaults();
+async function openCreateMode() {
+    try {
+        await loadForeignKeyOptions();
+        resetFormDefaults();
 
-    const formMode = document.querySelector("[data-form-mode]");
-    const formTitle = document.querySelector("[data-form-title]");
-    const saveBtn = document.querySelector("[data-save-btn]");
+        const formMode = document.querySelector("[data-form-mode]");
+        const formTitle = document.querySelector("[data-form-title]");
+        const saveBtn = document.querySelector("[data-save-btn]");
 
-    if (formMode) {
-        formMode.textContent = "Nueva solicitud";
+        if (formMode) {
+            formMode.textContent = "Nueva solicitud";
+        }
+
+        if (formTitle) {
+            formTitle.textContent = "Registrar solicitud";
+        }
+
+        if (saveBtn) {
+            saveBtn.textContent = "Guardar solicitud";
+        }
+
+        showForm();
+    } catch (error) {
+        const message = error instanceof Error ? error.message : "No se pudo preparar el formulario.";
+
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: message
+        });
+
+        console.error(error);
     }
-
-    if (formTitle) {
-        formTitle.textContent = "Registrar solicitud";
-    }
-
-    if (saveBtn) {
-        saveBtn.textContent = "Guardar solicitud";
-    }
-
-    showForm();
 }
 
 async function openEditMode(id) {
@@ -296,6 +406,7 @@ async function openEditMode(id) {
             throw new Error(json.message || "No se pudo cargar la solicitud.");
         }
 
+        await loadForeignKeyOptions();
         fillForm(json.record);
 
         const formMode = document.querySelector("[data-form-mode]");
@@ -419,6 +530,19 @@ async function handleSubmit(event) {
         payload[key] = normalizeValue(key, value);
     }
 
+    const hoy = new Date();
+    hoy.setMinutes(hoy.getMinutes() - hoy.getTimezoneOffset());
+    const fechaMinima = hoy.toISOString().split("T")[0];
+
+    if (payload.fecha_preferida && payload.fecha_preferida < fechaMinima) {
+        Swal.fire({
+            icon: "warning",
+            title: "Fecha no válida",
+            text: "No puedes seleccionar una fecha anterior a hoy."
+        });
+        return;
+    }
+
     const saveBtn = document.querySelector("[data-save-btn]");
     const originalText = saveBtn?.textContent || "Guardar solicitud";
 
@@ -466,6 +590,7 @@ async function handleSubmit(event) {
         }
     }
 }
+
 
 function normalizeValue(field, value) {
     const trimmed = typeof value === "string" ? value.trim() : value;

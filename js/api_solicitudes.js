@@ -49,10 +49,20 @@ async function deleteRecord(id) {
     return request("delete", { id });
 }
 
+async function getClientes() {
+    return request("getClientes");
+}
+
+async function getServicios() {
+    return request("getServicios");
+}
+
 export {
     getAll,
     getOne,
     create,
     update,
-    deleteRecord
+    deleteRecord,
+    getClientes,
+    getServicios
 };

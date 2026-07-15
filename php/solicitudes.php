@@ -5,16 +5,27 @@ header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . '/lib/functions.php';
 
-/*
- * Fallbacks para que el endpoint no dependa de helpers que ya no existan
- * o que hayan cambiado de nombre en lib/functions_quotes.php.
- */
-
-if (!function_exists('sendJson')) {
-    function sendJson(array $payload): void
+if (!function_exists('solicitudesTable')) {
+    function solicitudesTable(): string
     {
-        echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        exit;
+        return 'solicitudes';
+    }
+}
+
+if (!function_exists('solicitudesRequestData')) {
+    function solicitudesRequestData(): array
+    {
+        $raw = file_get_contents('php://input');
+
+        if ($raw !== false && trim($raw) !== '') {
+            $decoded = json_decode($raw, true);
+
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                return $decoded;
+            }
+        }
+
+        return $_POST;
     }
 }
 
@@ -22,6 +33,7 @@ if (!function_exists('tableColumns')) {
     function tableColumns(string $table): array
     {
         $stmt = dbConnection()->query("SHOW COLUMNS FROM `$table`");
+
         if (!$stmt) {
             return [];
         }
@@ -51,24 +63,64 @@ if (!function_exists('maskSensitiveValues')) {
     }
 }
 
-function solicitudesTable(): string
-{
-    return 'solicitudes';
+if (!function_exists('tablePrimaryKey')) {
+    function tablePrimaryKey(string $table): string
+    {
+        $columns = tableColumns($table);
+
+        if (in_array('id', $columns, true)) {
+            return 'id';
+        }
+
+        foreach ($columns as $column) {
+            if (str_starts_with($column, 'id_')) {
+                return $column;
+            }
+        }
+
+        return $columns[0] ?? 'id';
+    }
 }
 
-function solicitudesRequestData(): array
-{
-    $raw = file_get_contents('php://input');
+if (!function_exists('tableDisplayColumn')) {
+    function tableDisplayColumn(string $table, array $candidates): string
+    {
+        $columns = tableColumns($table);
 
-    if ($raw !== false && trim($raw) !== '') {
-        $decoded = json_decode($raw, true);
-
-        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-            return $decoded;
+        foreach ($candidates as $candidate) {
+            if (in_array($candidate, $columns, true)) {
+                return $candidate;
+            }
         }
-    }
 
-    return $_POST;
+        return $columns[0] ?? tablePrimaryKey($table);
+    }
+}
+
+if (!function_exists('tableOptions')) {
+    function tableOptions(string $table, array $candidates): array
+    {
+        $pk = tablePrimaryKey($table);
+        $labelColumn = tableDisplayColumn($table, $candidates);
+
+        $sql = sprintf(
+            'SELECT `%s` AS id, `%s` AS label
+             FROM `%s`
+             ORDER BY `%s` ASC',
+            $pk,
+            $labelColumn,
+            $table,
+            $labelColumn
+        );
+
+        $stmt = dbConnection()->query($sql);
+
+        if (!$stmt) {
+            return [];
+        }
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
 
 function solicitudesColumns(): array
@@ -83,19 +135,7 @@ function solicitudesHasColumn(string $column): bool
 
 function solicitudesPrimaryKey(): string
 {
-    $columns = solicitudesColumns();
-
-    if (in_array('id', $columns, true)) {
-        return 'id';
-    }
-
-    foreach ($columns as $column) {
-        if (str_starts_with($column, 'id_')) {
-            return $column;
-        }
-    }
-
-    return $columns[0] ?? 'id';
+    return tablePrimaryKey(solicitudesTable());
 }
 
 function solicitudesEditableFields(): array
@@ -180,14 +220,42 @@ function solicitudesAll(): array
     $pk = solicitudesPrimaryKey();
     $columns = solicitudesColumns();
 
-    if ($columns === []) {
-        return [
-            'ok' => false,
-            'message' => 'No se pudieron leer las columnas de la tabla solicitudes.',
-        ];
-    }
+    $clientePk = tablePrimaryKey('usuarios');
+    $clienteLabel = tableDisplayColumn('usuarios', [
+        'nombre',
+        'titulo',
+        'descripcion',
+        'nombre_completo',
+        'full_name',
+        'razon_social',
+        'name'
+    ]);
 
-    $stmt = dbConnection()->query("SELECT * FROM `$table` ORDER BY `$pk` DESC");
+    $servicioPk = tablePrimaryKey('servicios');
+    $servicioLabel = tableDisplayColumn('servicios', [
+        'nombre',
+        'titulo',
+        'descripcion',
+        'nombre_servicio',
+        'servicio',
+        'name'
+    ]);
+
+    $sql = sprintf(
+        'SELECT s.*, u.`%s` AS cliente_nombre, sv.`%s` AS servicio_nombre
+         FROM `%s` s
+         LEFT JOIN `usuarios` u ON u.`%s` = s.`cliente_id`
+         LEFT JOIN `servicios` sv ON sv.`%s` = s.`servicio_id`
+         ORDER BY s.`%s` DESC',
+        $clienteLabel,
+        $servicioLabel,
+        $table,
+        $clientePk,
+        $servicioPk,
+        $pk
+    );
+
+    $stmt = dbConnection()->query($sql);
     $records = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
     return [
@@ -212,7 +280,43 @@ function solicitudesOne(array $input): array
         ];
     }
 
-    $stmt = dbConnection()->prepare("SELECT * FROM `$table` WHERE `$pk` = :id LIMIT 1");
+    $clientePk = tablePrimaryKey('usuarios');
+    $clienteLabel = tableDisplayColumn('usuarios', [
+        'nombre',
+        'titulo',
+        'descripcion',
+        'nombre_completo',
+        'full_name',
+        'razon_social',
+        'name'
+    ]);
+
+    $servicioPk = tablePrimaryKey('servicios');
+    $servicioLabel = tableDisplayColumn('servicios', [
+        'nombre',
+        'titulo',
+        'descripcion',
+        'nombre_servicio',
+        'servicio',
+        'name'
+    ]);
+
+    $sql = sprintf(
+        'SELECT s.*, u.`%s` AS cliente_nombre, sv.`%s` AS servicio_nombre
+         FROM `%s` s
+         LEFT JOIN `usuarios` u ON u.`%s` = s.`cliente_id`
+         LEFT JOIN `servicios` sv ON sv.`%s` = s.`servicio_id`
+         WHERE s.`%s` = :id
+         LIMIT 1',
+        $clienteLabel,
+        $servicioLabel,
+        $table,
+        $clientePk,
+        $servicioPk,
+        $pk
+    );
+
+    $stmt = dbConnection()->prepare($sql);
     $stmt->execute([':id' => $id]);
     $record = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -276,7 +380,7 @@ function solicitudesCreate(array $input): array
     $stmt = dbConnection()->prepare($sql);
 
     foreach ($data as $column => $value) {
-        $stmt->bindValue(':' . $column, $value, $value === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+        $stmt->bindValue(':' . $column, $value, $value === null ? PDO::PARAM_NULL : (is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR));
     }
 
     $stmt->execute();
@@ -330,7 +434,7 @@ function solicitudesUpdate(array $input): array
     $stmt->bindValue(':id', $id);
 
     foreach ($data as $column => $value) {
-        $stmt->bindValue(':' . $column, $value, $value === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+        $stmt->bindValue(':' . $column, $value, $value === null ? PDO::PARAM_NULL : (is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR));
     }
 
     $stmt->execute();
@@ -363,6 +467,39 @@ function solicitudesDelete(array $input): array
     ];
 }
 
+function solicitudesClientes(): array
+{
+    return [
+        'ok' => true,
+        'table' => 'usuarios',
+        'options' => tableOptions('usuarios', [
+            'nombre',
+            'titulo',
+            'descripcion',
+            'nombre_completo',
+            'full_name',
+            'razon_social',
+            'name'
+        ]),
+    ];
+}
+
+function solicitudesServicios(): array
+{
+    return [
+        'ok' => true,
+        'table' => 'servicios',
+        'options' => tableOptions('servicios', [
+            'nombre',
+            'titulo',
+            'descripcion',
+            'nombre_servicio',
+            'servicio',
+            'name'
+        ]),
+    ];
+}
+
 $input = solicitudesRequestData();
 $action = (string) ($input['action'] ?? '');
 
@@ -385,6 +522,14 @@ switch ($action) {
 
     case 'delete':
         sendJson(solicitudesDelete($input));
+        break;
+
+    case 'getClientes':
+        sendJson(solicitudesClientes());
+        break;
+
+    case 'getServicios':
+        sendJson(solicitudesServicios());
         break;
 
     default:
