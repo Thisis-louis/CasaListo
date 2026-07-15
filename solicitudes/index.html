@@ -7,18 +7,161 @@
     <link rel="icon" href="../assets/img/Logo.png">
     <link rel="stylesheet" href="../assets/css/casalisto-theme.css">
     <link rel="stylesheet" href="../assets/css/modules.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="module-page" data-module="solicitudes" data-endpoint="../php/solicitudes.php">
     <header class="module-header">
         <div class="cl-container module-header__inner">
-            <a class="cl-brand" href="../index.php"><img class="cl-brand__logo" src="../assets/img/Logo.png" alt="CasaListo"><span class="cl-brand__name">Casa<span>Listo</span></span></a>
-            <nav class="module-nav"><a class="cl-button cl-button--ghost" href="../index.php">Inicio</a><a class="cl-button cl-button--secondary" href="../admin/dashboard.php">Admin</a></nav>
+            <a class="cl-brand" href="../index.php">
+                <img class="cl-brand__logo" src="../assets/img/Logo.png" alt="CasaListo">
+                <span class="cl-brand__name">Casa<span>Listo</span></span>
+            </a>
+
+            <nav class="module-nav">
+                <a class="cl-button cl-button--ghost" href="../index.php">Inicio</a>
+                <a class="cl-button cl-button--secondary" href="../admin/dashboard.php">Admin</a>
+            </nav>
         </div>
     </header>
+
     <main class="cl-container module-main">
-        <section class="module-title"><div><p class="cl-eyebrow">Módulo</p><h1 data-module-title>Solicitudes</h1><p>Registros actuales de la tabla solicitudes.</p></div><span class="cl-status" data-module-count>0 registros</span></section>
-        <section class="module-table-shell"><div class="module-loading" data-table-status>Cargando registros...</div><div class="module-table-scroll"><table class="module-table"><thead data-table-head></thead><tbody data-table-body></tbody></table></div></section>
+        <section class="module-title">
+            <div>
+                <p class="cl-eyebrow">Módulo</p>
+                <h1 data-module-title>Solicitudes</h1>
+                <p>Administra aquí los registros de la tabla solicitudes.</p>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button type="button" class="cl-button cl-button--secondary" data-add-btn>
+                    Agregar
+                </button>
+                <span class="cl-status" data-module-count>0 registros</span>
+            </div>
+        </section>
+
+        <section class="module-table-shell" data-table-container>
+            <div class="module-loading" data-table-status>Cargando registros...</div>
+
+            <div class="module-table-scroll">
+                <table class="module-table">
+                    <thead data-table-head></thead>
+                    <tbody data-table-body></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="module-form-shell" data-form-container hidden>
+            <div class="module-form-header">
+                <div>
+                    <p class="cl-eyebrow" data-form-mode>Nueva solicitud</p>
+                    <h2 data-form-title>Registrar solicitud</h2>
+                </div>
+
+                <div class="module-form-actions">
+                    <button type="button" class="cl-button cl-button--ghost" data-cancel-btn>
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+
+            <form id="solicitudForm" class="module-form">
+                <input type="hidden" id="id" name="id">
+
+                <div class="module-form-grid">
+                    <label class="module-field">
+                        <span>Cliente ID</span>
+                        <input type="number" id="cliente_id" name="cliente_id" min="1" step="1" required>
+                    </label>
+
+                    <label class="module-field">
+                        <span>Servicio ID</span>
+                        <input type="number" id="servicio_id" name="servicio_id" min="1" step="1" required>
+                    </label>
+
+                    <label class="module-field">
+                        <span>Folio</span>
+                        <input type="text" id="folio" name="folio" placeholder="Se genera automáticamente si lo dejas vacío">
+                    </label>
+
+                    <label class="module-field">
+                        <span>Título</span>
+                        <input type="text" id="titulo" name="titulo" maxlength="255" required>
+                    </label>
+
+                    <label class="module-field module-field--full">
+                        <span>Descripción</span>
+                        <textarea id="descripcion" name="descripcion" rows="4" required></textarea>
+                    </label>
+
+                    <label class="module-field">
+                        <span>Dirección</span>
+                        <input type="text" id="direccion" name="direccion" required>
+                    </label>
+
+                    <label class="module-field">
+                        <span>Colonia</span>
+                        <input type="text" id="colonia" name="colonia" required>
+                    </label>
+
+                    <label class="module-field">
+                        <span>Ciudad</span>
+                        <input type="text" id="ciudad" name="ciudad" required>
+                    </label>
+
+                    <label class="module-field">
+                        <span>Estado / Región</span>
+                        <input type="text" id="estado_region" name="estado_region" required>
+                    </label>
+
+                    <label class="module-field">
+                        <span>Código postal</span>
+                        <input type="text" id="codigo_postal" name="codigo_postal" inputmode="numeric" maxlength="10" required>
+                    </label>
+
+                    <label class="module-field">
+                        <span>Fecha preferida</span>
+                        <input type="date" id="fecha_preferida" name="fecha_preferida" required>
+                    </label>
+
+                    <label class="module-field">
+                        <span>Hora preferida</span>
+                        <input type="time" id="hora_preferida" name="hora_preferida" required>
+                    </label>
+
+                    <label class="module-field">
+                        <span>Urgencia</span>
+                        <select id="urgencia" name="urgencia" required>
+                            <option value="baja">Baja</option>
+                            <option value="normal" selected>Normal</option>
+                            <option value="alta">Alta</option>
+                        </select>
+                    </label>
+
+                    <label class="module-field">
+                        <span>Estado</span>
+                        <select id="estado" name="estado" required>
+                            <option value="nueva" selected>Nueva</option>
+                            <option value="en_revision">En revisión</option>
+                            <option value="programada">Programada</option>
+                            <option value="completada">Completada</option>
+                            <option value="cancelada">Cancelada</option>
+                        </select>
+                    </label>
+                </div>
+
+                <div class="module-form-footer">
+                    <button type="submit" class="cl-button cl-button--secondary" data-save-btn>
+                        Guardar solicitud
+                    </button>
+                    <button type="reset" class="cl-button cl-button--ghost">
+                        Limpiar
+                    </button>
+                </div>
+            </form>
+        </section>
     </main>
-    <script src="../js/module-table.js"></script>
+
+    <script type="module" src="../js/solicitudes.js?v=5"></script>
 </body>
 </html>
