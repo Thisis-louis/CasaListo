@@ -22,11 +22,24 @@ export function renderTable(payload) {
 
   head.innerHTML = '';
   body.innerHTML = '';
-  count.textContent = `${payload.records.length} registros`;
+  count.textContent = `${payload.pagination?.total_records ?? payload.records.length} registros`;
 
   payload.columns.forEach((column) => {
     const th = document.createElement('th');
-    th.textContent = label(column);
+
+    if ((payload.sortable_columns || []).includes(column)) {
+      const button = document.createElement('button');
+      const active = payload.sort === column;
+      const direction = String(payload.dir || 'DESC').toLowerCase();
+
+      button.type = 'button';
+      button.dataset.sortColumn = column;
+      button.textContent = `${label(column)} ${active ? (direction === 'asc' ? '↑' : '↓') : '↕'}`;
+      th.appendChild(button);
+    } else {
+      th.textContent = label(column);
+    }
+
     head.appendChild(th);
   });
 
@@ -54,6 +67,60 @@ export function renderTable(payload) {
 
     tr.appendChild(actions);
     body.appendChild(tr);
+  });
+}
+
+export function renderSortOptions(payload) {
+  const sort = document.querySelector('#moduleSort');
+  const direction = document.querySelector('#moduleDirection');
+
+  sort.innerHTML = '';
+
+  (payload.sortable_columns || []).forEach((column) => {
+    const option = document.createElement('option');
+    option.value = column;
+    option.textContent = label(column);
+    sort.appendChild(option);
+  });
+
+  sort.value = payload.sort || '';
+  direction.value = String(payload.dir || 'DESC').toLowerCase();
+}
+
+export function renderPagination(payload, onPage) {
+  const root = document.querySelector('#modulePagination');
+  const pagination = payload.pagination;
+
+  root.innerHTML = '';
+
+  if (!pagination) {
+    return;
+  }
+
+  const summary = document.createElement('p');
+  const actions = document.createElement('div');
+  const previous = pageButton('Anterior', pagination.page - 1, !pagination.has_previous);
+  const next = pageButton('Siguiente', pagination.page + 1, !pagination.has_next);
+
+  summary.textContent = `${pagination.per_page} por página · Página ${pagination.page} de ${pagination.total_pages}`;
+  actions.className = 'module-spa-page-actions';
+  actions.appendChild(previous);
+
+  pageRange(pagination.page, pagination.total_pages).forEach((page) => {
+    const button = pageButton(String(page), page, false);
+
+    if (page === pagination.page) {
+      button.classList.add('is-active');
+    }
+
+    actions.appendChild(button);
+  });
+
+  actions.appendChild(next);
+  root.append(summary, actions);
+
+  root.querySelectorAll('[data-page]').forEach((button) => {
+    button.addEventListener('click', () => onPage(Number(button.dataset.page)));
   });
 }
 
@@ -100,4 +167,27 @@ function label(column) {
   return column
     .replaceAll('_', ' ')
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function pageButton(text, page, disabled) {
+  const button = document.createElement('button');
+
+  button.type = 'button';
+  button.textContent = text;
+  button.dataset.page = String(Math.max(1, page));
+  button.disabled = disabled;
+
+  return button;
+}
+
+function pageRange(current, total) {
+  const start = Math.max(1, current - 2);
+  const end = Math.min(total, current + 2);
+  const pages = [];
+
+  for (let page = start; page <= end; page += 1) {
+    pages.push(page);
+  }
+
+  return pages;
 }

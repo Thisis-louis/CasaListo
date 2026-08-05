@@ -5,8 +5,18 @@ export async function getModules() {
   return readResponse(response);
 }
 
-export async function getRecords(table) {
-  const response = await fetch(`${API_URL}?table=${table}`);
+export async function getRecords(table, params = {}) {
+  const url = new URL(API_URL, window.location.href);
+
+  url.searchParams.set('table', table);
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      url.searchParams.set(key, value);
+    }
+  });
+
+  const response = await fetch(url);
   return readResponse(response);
 }
 

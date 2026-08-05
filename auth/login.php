@@ -72,7 +72,6 @@ $message = $messages[$error] ?? '';
                 <button class="cl-button cl-button--primary" type="submit">Entrar</button>
 
                 <p class="auth-help">¿Eres cliente nuevo? <a href="registro.php">Crea tu cuenta</a></p>
-                <p class="auth-help">Usuario inicial: <strong>admin@casalisto.local</strong></p>
             </form>
         </section>
     </main>

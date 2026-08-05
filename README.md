@@ -114,12 +114,7 @@ La validacion de credenciales esta en:
 php/auth/login.php
 ```
 
-Usuario administrador inicial para desarrollo local:
-
-- Correo: `admin@casalisto.local`
-- Contrasena: `CasaListo2026!`
-
-Este usuario debe cambiarse antes de usar el sistema en produccion.
+Los accesos administrativos no deben mostrarse en pantallas publicas. Si se usa un usuario inicial en desarrollo local, debe cambiarse antes de trabajar con datos reales.
 
 ## Registro de usuarios
 
@@ -185,3 +180,38 @@ La tabla visual de cada modulo se renderiza con:
 js/module-table.js
 assets/css/modules.css
 ```
+
+Todos los modulos incluyen un filtro de busqueda. El filtro envia el parametro `q` al endpoint PHP correspondiente y la busqueda se ejecuta en SQL desde `php/functions.php`, no solamente en JavaScript.
+
+Todos los modulos incluyen ordenamiento por SQL. Cada endpoint acepta:
+
+```text
+sort=nombre_columna
+dir=asc|desc
+```
+
+Cada modulo expone al menos tres columnas coherentes para ordenar en formato ascendente o descendente. La lista de columnas permitidas vive en `php/functions.php`.
+
+## Dashboards por rol
+
+Los dashboards principales de administrador, cliente y tecnico cargan indicadores desde SQL al iniciar sesion:
+
+```text
+admin/dashboard.php
+cliente/dashboard.php
+tecnico/dashboard.php
+php/dashboard/admin.php
+php/dashboard/cliente.php
+php/dashboard/tecnico.php
+php/dashboard/functions.php
+js/dashboard.js
+```
+
+Cada dashboard permite consultar historial por:
+
+- Dia
+- Semana
+- Mes
+- Año
+
+El selector envia `period=day|week|month|year` al endpoint correspondiente. Las metricas y graficas se calculan con consultas SQL sobre solicitudes, asignaciones, pagos, categorias, servicios y calificaciones.

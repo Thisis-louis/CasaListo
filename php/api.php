@@ -174,21 +174,14 @@ function orderBySql(string $table, array $columns): string
 function listRecords(string $table): array
 {
     $meta = metadata($table);
-    $orderBy = orderBySql($table, $meta['columns']);
-    $stmt = dbConnection()->query("SELECT * FROM `$table` ORDER BY $orderBy LIMIT 200");
-    $records = array_map('maskSensitiveValues', $stmt->fetchAll());
+    $payload = tableRecords($table);
 
-    return [
-        'ok' => true,
-        'table' => $table,
-        'title' => tableLabel($table),
+    return array_merge($payload, [
         'csrf_token' => csrfToken(),
         'modules' => moduleTables(),
-        'columns' => $meta['columns'],
         'fields' => $meta['fields'],
         'primary' => $meta['primary'],
-        'records' => $records,
-    ];
+    ]);
 }
 
 function slugText(string $value): string
