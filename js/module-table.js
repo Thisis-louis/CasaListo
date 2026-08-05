@@ -2,8 +2,12 @@ const moduleRoot = document.querySelector('[data-module]');
 const tableHead = document.querySelector('[data-table-head]');
 const tableBody = document.querySelector('[data-table-body]');
 const tableStatus = document.querySelector('[data-table-status]');
+const tableShell = document.querySelector('.module-table-shell');
 const moduleTitle = document.querySelector('[data-module-title]');
 const moduleCount = document.querySelector('[data-module-count]');
+const searchForm = document.querySelector('[data-search-form]');
+const searchInput = document.querySelector('[data-search-input]');
+const searchReset = document.querySelector('[data-search-reset]');
 const serviceForm = document.querySelector('[data-service-form]');
 const serviceFormTitle = document.querySelector('[data-service-form-title]');
 const serviceSubmit = document.querySelector('[data-service-submit]');
@@ -16,6 +20,11 @@ const serviceState = {
   csrfToken: '',
   records: [],
 };
+
+let sortSelect;
+let directionSelect;
+let paginationShell;
+let currentPage = 1;
 
 function formatColumnName(column) {
   return column
@@ -43,6 +52,38 @@ function setStatus(message, type = 'loading') {
   tableStatus.className = `module-${type}`;
   tableStatus.textContent = message;
   tableStatus.hidden = false;
+}
+
+function currentSearchValue() {
+  return searchInput?.value.trim() || '';
+}
+
+function currentSortValue() {
+  return sortSelect?.value || '';
+}
+
+function currentDirectionValue() {
+  return directionSelect?.value || 'desc';
+}
+
+function moduleEndpointUrl() {
+  const url = new URL(moduleRoot.dataset.endpoint, window.location.href);
+  const search = currentSearchValue();
+  const sort = currentSortValue();
+  const direction = currentDirectionValue();
+
+  if (search !== '') {
+    url.searchParams.set('q', search);
+  }
+
+  if (sort !== '') {
+    url.searchParams.set('sort', sort);
+    url.searchParams.set('dir', direction);
+  }
+
+  url.searchParams.set('page', String(currentPage));
+
+  return url;
 }
 
 function hideStatus() {
@@ -162,10 +203,193 @@ function renderActionCell(row, record) {
   row.appendChild(td);
 }
 
+function createFilterSelect(id, label, options) {
+  const field = document.createElement('div');
+  const labelElement = document.createElement('label');
+  const select = document.createElement('select');
+
+  field.className = 'module-filter-field';
+  labelElement.htmlFor = id;
+  labelElement.textContent = label;
+  select.className = 'cl-select';
+  select.id = id;
+
+  options.forEach((optionData) => {
+    const option = document.createElement('option');
+    option.value = optionData.value;
+    option.textContent = optionData.label;
+    select.appendChild(option);
+  });
+
+  field.append(labelElement, select);
+
+  return { field, select };
+}
+
+function ensureSortControls(payload) {
+  if (!searchForm || sortSelect || directionSelect) {
+    return;
+  }
+
+  const sortableColumns = payload.sortable_columns || [];
+
+  if (sortableColumns.length < 3) {
+    return;
+  }
+
+  const sortControl = createFilterSelect(
+    'module-sort',
+    'Ordenar por',
+    sortableColumns.map((column) => ({
+      value: column,
+      label: formatColumnName(column),
+    })),
+  );
+  const directionControl = createFilterSelect('module-direction', 'Dirección', [
+    { value: 'asc', label: 'Ascendente' },
+    { value: 'desc', label: 'Descendente' },
+  ]);
+  const submitButton = searchForm.querySelector('button[type="submit"]');
+
+  sortSelect = sortControl.select;
+  directionSelect = directionControl.select;
+
+  searchForm.insertBefore(sortControl.field, submitButton);
+  searchForm.insertBefore(directionControl.field, submitButton);
+
+  sortSelect.addEventListener('change', () => {
+    currentPage = 1;
+    loadModuleTable();
+  });
+  directionSelect.addEventListener('change', () => {
+    currentPage = 1;
+    loadModuleTable();
+  });
+}
+
+function setSortControls(payload) {
+  ensureSortControls(payload);
+
+  if (sortSelect && payload.sort) {
+    sortSelect.value = payload.sort;
+  }
+
+  if (directionSelect && payload.dir) {
+    directionSelect.value = payload.dir.toLowerCase();
+  }
+}
+
+function toggleSort(column) {
+  if (!sortSelect || !directionSelect) {
+    return;
+  }
+
+  if (sortSelect.value === column) {
+    directionSelect.value = directionSelect.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortSelect.value = column;
+    directionSelect.value = 'asc';
+  }
+
+  currentPage = 1;
+  loadModuleTable();
+}
+
+function ensurePaginationShell() {
+  if (paginationShell || !tableShell) {
+    return;
+  }
+
+  paginationShell = document.createElement('nav');
+  paginationShell.className = 'module-pagination';
+  paginationShell.setAttribute('aria-label', 'Paginación de registros');
+  tableShell.after(paginationShell);
+}
+
+function paginationRange(current, total) {
+  const pages = new Set([1, total]);
+  const start = Math.max(1, current - 2);
+  const end = Math.min(total, current + 2);
+
+  for (let page = start; page <= end; page += 1) {
+    pages.add(page);
+  }
+
+  return [...pages].sort((a, b) => a - b);
+}
+
+function createPageButton(label, page, options = {}) {
+  const button = document.createElement('button');
+
+  button.type = 'button';
+  button.className = `module-page-button${options.active ? ' is-active' : ''}`;
+  button.textContent = label;
+  button.disabled = Boolean(options.disabled);
+  button.dataset.page = String(page);
+
+  return button;
+}
+
+function renderPagination(payload) {
+  ensurePaginationShell();
+
+  if (!paginationShell) {
+    return;
+  }
+
+  const pagination = payload.pagination;
+
+  if (!pagination) {
+    paginationShell.hidden = true;
+    return;
+  }
+
+  currentPage = pagination.page;
+  paginationShell.hidden = false;
+  paginationShell.innerHTML = '';
+
+  const summary = document.createElement('p');
+  const controls = document.createElement('div');
+  const totalPages = pagination.total_pages;
+  const totalRecords = pagination.total_records;
+
+  summary.className = 'module-pagination-summary';
+  summary.textContent = `${totalRecords} registro${totalRecords === 1 ? '' : 's'} · ${pagination.per_page} por página · Página ${pagination.page} de ${totalPages}`;
+  controls.className = 'module-pagination-controls';
+
+  controls.appendChild(createPageButton('Anterior', Math.max(1, pagination.page - 1), {
+    disabled: !pagination.has_previous,
+  }));
+
+  let previousPage = 0;
+  paginationRange(pagination.page, totalPages).forEach((page) => {
+    if (previousPage && page - previousPage > 1) {
+      const gap = document.createElement('span');
+      gap.className = 'module-page-gap';
+      gap.textContent = '...';
+      controls.appendChild(gap);
+    }
+
+    controls.appendChild(createPageButton(String(page), page, {
+      active: page === pagination.page,
+    }));
+    previousPage = page;
+  });
+
+  controls.appendChild(createPageButton('Siguiente', Math.min(totalPages, pagination.page + 1), {
+    disabled: !pagination.has_next,
+  }));
+
+  paginationShell.append(summary, controls);
+}
+
 function renderTable(payload) {
   const columns = payload.columns || [];
   const records = payload.records || [];
+  const sortableColumns = payload.sortable_columns || [];
   const withActions = isServicesModule() && payload.actions;
+
+  setSortControls(payload);
 
   if (isServicesModule()) {
     serviceState.records = records;
@@ -177,22 +401,44 @@ function renderTable(payload) {
     moduleTitle.textContent = payload.title;
   }
 
+  if (searchInput && payload.search !== undefined && searchInput.value !== payload.search) {
+    searchInput.value = payload.search;
+  }
+
   if (moduleCount) {
-    moduleCount.textContent = `${records.length} registro${records.length === 1 ? '' : 's'}`;
+    const totalRecords = payload.pagination?.total_records ?? records.length;
+    const suffix = payload.search ? ' encontrados' : '';
+    moduleCount.textContent = `${totalRecords} registro${totalRecords === 1 ? '' : 's'}${suffix}`;
   }
 
   tableHead.innerHTML = '';
   tableBody.innerHTML = '';
 
   if (!records.length) {
-    setStatus('No hay registros para mostrar.', 'empty');
+    setStatus(payload.search ? 'No hay registros que coincidan con la búsqueda.' : 'No hay registros para mostrar.', 'empty');
+    renderPagination(payload);
     return;
   }
 
   const headRow = document.createElement('tr');
   columns.forEach((column) => {
     const th = document.createElement('th');
-    th.textContent = formatColumnName(column);
+    const isSortable = sortableColumns.includes(column);
+
+    if (isSortable) {
+      const button = document.createElement('button');
+      const isActive = payload.sort === column;
+      const direction = String(payload.dir || 'DESC').toLowerCase();
+
+      button.type = 'button';
+      button.className = 'module-sort-button';
+      button.dataset.sortColumn = column;
+      button.textContent = `${formatColumnName(column)} ${isActive ? (direction === 'asc' ? '↑' : '↓') : '↕'}`;
+      th.appendChild(button);
+    } else {
+      th.textContent = formatColumnName(column);
+    }
+
     headRow.appendChild(th);
   });
 
@@ -221,6 +467,7 @@ function renderTable(payload) {
   });
 
   hideStatus();
+  renderPagination(payload);
 }
 
 async function loadModuleTable() {
@@ -228,11 +475,10 @@ async function loadModuleTable() {
     return;
   }
 
-  const endpoint = moduleRoot.dataset.endpoint;
   setStatus('Cargando registros...');
 
   try {
-    const response = await fetch(endpoint, {
+    const response = await fetch(moduleEndpointUrl(), {
       headers: {
         Accept: 'application/json',
       },
@@ -255,6 +501,58 @@ async function loadModuleTable() {
 }
 
 loadModuleTable();
+
+if (searchForm) {
+  let searchTimer;
+
+  searchForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    currentPage = 1;
+    loadModuleTable();
+  });
+
+  searchInput?.addEventListener('input', () => {
+    window.clearTimeout(searchTimer);
+    currentPage = 1;
+    searchTimer = window.setTimeout(loadModuleTable, 320);
+  });
+}
+
+if (searchReset) {
+  searchReset.addEventListener('click', () => {
+    if (searchInput) {
+      searchInput.value = '';
+    }
+
+    currentPage = 1;
+    loadModuleTable();
+  });
+}
+
+if (paginationShell || tableShell) {
+  document.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-page]');
+
+    if (!button || !button.closest('.module-pagination') || button.disabled) {
+      return;
+    }
+
+    currentPage = Number(button.dataset.page) || 1;
+    loadModuleTable();
+  });
+}
+
+if (tableHead) {
+  tableHead.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-sort-column]');
+
+    if (!button) {
+      return;
+    }
+
+    toggleSort(button.dataset.sortColumn);
+  });
+}
 
 if (serviceForm) {
   serviceForm.addEventListener('submit', async (event) => {

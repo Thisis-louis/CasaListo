@@ -38,11 +38,31 @@ $user = requireAuth(['cliente']);
                 <div>
                     <p class="cl-eyebrow">Panel de cliente</p>
                     <h1>Hola, <?= e($user['nombre']) ?></h1>
-                    <p>Aquí podrás crear solicitudes, revisar cotizaciones, pagos y calificar servicios.</p>
+                    <p>Consulta tus solicitudes, cotizaciones, pagos y servicios completados.</p>
                 </div>
                 <span class="cl-status">Cliente</span>
             </section>
+
+            <section class="dashboard-insights" data-dashboard data-endpoint="../php/dashboard/cliente.php">
+                <div class="dashboard-toolbar">
+                    <div>
+                        <p class="cl-eyebrow">Mis indicadores</p>
+                        <h2>Resumen de servicios</h2>
+                    </div>
+                    <div class="dashboard-periods" aria-label="Periodo del dashboard">
+                        <button class="dashboard-period-button" type="button" data-dashboard-period="day">Día</button>
+                        <button class="dashboard-period-button" type="button" data-dashboard-period="week">Semana</button>
+                        <button class="dashboard-period-button is-active" type="button" data-dashboard-period="month">Mes</button>
+                        <button class="dashboard-period-button" type="button" data-dashboard-period="year">Año</button>
+                    </div>
+                </div>
+
+                <div class="dashboard-status" data-dashboard-status>Cargando información del dashboard...</div>
+                <div class="dashboard-grid" data-dashboard-metrics></div>
+                <div class="dashboard-chart-grid" data-dashboard-charts></div>
+            </section>
         </main>
     </div>
+    <script src="../js/dashboard.js"></script>
 </body>
 </html>

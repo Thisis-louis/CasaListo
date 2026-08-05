@@ -48,6 +48,26 @@ requireAuth(['administrador']);
                 <button id="listBtn" type="button" class="hidden">Volver</button>
             </div>
 
+            <form class="module-spa-filters" id="moduleFilters">
+                <label>
+                    Buscar
+                    <input class="cl-input" id="moduleSearch" type="search" placeholder="Buscar en este módulo" autocomplete="off">
+                </label>
+                <label>
+                    Ordenar por
+                    <select class="cl-select" id="moduleSort"></select>
+                </label>
+                <label>
+                    Dirección
+                    <select class="cl-select" id="moduleDirection">
+                        <option value="asc">Ascendente</option>
+                        <option value="desc">Descendente</option>
+                    </select>
+                </label>
+                <button class="cl-button cl-button--primary" type="submit">Aplicar</button>
+                <button class="cl-button cl-button--ghost" type="button" id="clearFilters">Limpiar</button>
+            </form>
+
             <div id="message" class="module-message" hidden></div>
 
             <div id="tableList">
@@ -60,6 +80,8 @@ requireAuth(['administrador']);
                     </table>
                 </div>
             </div>
+
+            <nav class="module-spa-pagination" id="modulePagination" aria-label="Paginación de registros"></nav>
 
             <div id="formContainer" class="hidden"></div>
         </section>

@@ -11,13 +11,6 @@ function e(?string $value): string
 
 $user = requireAuth(['administrador']);
 
-$metrics = [
-    'Solicitudes' => (int) db()->query('SELECT COUNT(*) FROM solicitudes')->fetchColumn(),
-    'Cotizaciones' => (int) db()->query('SELECT COUNT(*) FROM cotizaciones')->fetchColumn(),
-    'Técnicos' => (int) db()->query('SELECT COUNT(*) FROM tecnicos')->fetchColumn(),
-    'Servicios' => (int) db()->query('SELECT COUNT(*) FROM servicios')->fetchColumn(),
-];
-
 $modules = [
     'roles' => 'Roles',
     'usuarios' => 'Usuarios',
@@ -71,13 +64,23 @@ $modules = [
                 <span class="cl-status">Administrador</span>
             </section>
 
-            <section class="dashboard-grid">
-                <?php foreach ($metrics as $label => $value): ?>
-                    <article class="metric-card">
-                        <span><?= e($label) ?></span>
-                        <strong><?= $value ?></strong>
-                    </article>
-                <?php endforeach; ?>
+            <section class="dashboard-insights" data-dashboard data-endpoint="../php/dashboard/admin.php">
+                <div class="dashboard-toolbar">
+                    <div>
+                        <p class="cl-eyebrow">Indicadores en tiempo real</p>
+                        <h2>Resumen operativo</h2>
+                    </div>
+                    <div class="dashboard-periods" aria-label="Periodo del dashboard">
+                        <button class="dashboard-period-button" type="button" data-dashboard-period="day">Día</button>
+                        <button class="dashboard-period-button" type="button" data-dashboard-period="week">Semana</button>
+                        <button class="dashboard-period-button is-active" type="button" data-dashboard-period="month">Mes</button>
+                        <button class="dashboard-period-button" type="button" data-dashboard-period="year">Año</button>
+                    </div>
+                </div>
+
+                <div class="dashboard-status" data-dashboard-status>Cargando información del dashboard...</div>
+                <div class="dashboard-grid" data-dashboard-metrics></div>
+                <div class="dashboard-chart-grid" data-dashboard-charts></div>
             </section>
 
             <section class="dashboard-modules">
@@ -100,5 +103,6 @@ $modules = [
             </section>
         </main>
     </div>
+    <script src="../js/dashboard.js"></script>
 </body>
 </html>

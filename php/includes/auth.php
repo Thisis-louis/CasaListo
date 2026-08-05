@@ -9,8 +9,28 @@ const CASALISTO_BASE_URL = '/CasaListo';
 function startUserSession(): void
 {
     if (session_status() === PHP_SESSION_NONE) {
+        session_set_cookie_params([
+            'lifetime' => 0,
+            'path' => '/',
+            'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+            'httponly' => true,
+            'samesite' => 'Lax',
+        ]);
+
         session_start();
     }
+}
+
+function sendSecurityHeaders(): void
+{
+    if (headers_sent()) {
+        return;
+    }
+
+    header('X-Frame-Options: SAMEORIGIN');
+    header('X-Content-Type-Options: nosniff');
+    header('Referrer-Policy: strict-origin-when-cross-origin');
+    header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
 }
 
 function baseUrl(string $path = ''): string
@@ -75,14 +95,42 @@ function requireAuth(?array $allowedRoles = null): array
     $user = currentUser();
 
     if (!$user) {
+        if (expectsJson()) {
+            authJsonError('Sesión requerida.', 401);
+        }
+
         redirectTo('auth/login.php');
     }
 
     if ($allowedRoles !== null && !in_array($user['rol'], $allowedRoles, true)) {
+        if (expectsJson()) {
+            authJsonError('No tienes permiso para esta acción.', 403);
+        }
+
         redirectTo('auth/login.php?error=sin_permiso');
     }
 
     return $user;
+}
+
+function expectsJson(): bool
+{
+    $accept = $_SERVER['HTTP_ACCEPT'] ?? '';
+    $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+
+    return str_contains($accept, 'application/json')
+        || str_contains($requestUri, '/php/');
+}
+
+function authJsonError(string $message, int $status): never
+{
+    http_response_code($status);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode([
+        'ok' => false,
+        'message' => $message,
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    exit;
 }
 
 function roleHome(string $role): string
@@ -115,3 +163,5 @@ function logoutUser(): void
 
     session_destroy();
 }
+
+sendSecurityHeaders();

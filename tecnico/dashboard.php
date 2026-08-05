@@ -38,11 +38,31 @@ $user = requireAuth(['tecnico']);
                 <div>
                     <p class="cl-eyebrow">Panel de técnico</p>
                     <h1>Hola, <?= e($user['nombre']) ?></h1>
-                    <p>Aquí aparecerán trabajos asignados, estados de servicio y bitácora de avance.</p>
+                    <p>Revisa tus trabajos, pendientes, servicios completados y calificaciones.</p>
                 </div>
                 <span class="cl-status">Técnico</span>
             </section>
+
+            <section class="dashboard-insights" data-dashboard data-endpoint="../php/dashboard/tecnico.php">
+                <div class="dashboard-toolbar">
+                    <div>
+                        <p class="cl-eyebrow">Mis indicadores</p>
+                        <h2>Resumen de trabajo</h2>
+                    </div>
+                    <div class="dashboard-periods" aria-label="Periodo del dashboard">
+                        <button class="dashboard-period-button" type="button" data-dashboard-period="day">Día</button>
+                        <button class="dashboard-period-button" type="button" data-dashboard-period="week">Semana</button>
+                        <button class="dashboard-period-button is-active" type="button" data-dashboard-period="month">Mes</button>
+                        <button class="dashboard-period-button" type="button" data-dashboard-period="year">Año</button>
+                    </div>
+                </div>
+
+                <div class="dashboard-status" data-dashboard-status>Cargando información del dashboard...</div>
+                <div class="dashboard-grid" data-dashboard-metrics></div>
+                <div class="dashboard-chart-grid" data-dashboard-charts></div>
+            </section>
         </main>
     </div>
+    <script src="../js/dashboard.js"></script>
 </body>
 </html>

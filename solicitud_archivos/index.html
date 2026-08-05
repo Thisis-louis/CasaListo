@@ -17,6 +17,17 @@
     </header>
     <main class="cl-container module-main">
         <section class="module-title"><div><p class="cl-eyebrow">Módulo</p><h1 data-module-title>Archivos de solicitudes</h1><p>Registros actuales de la tabla solicitud_archivos.</p></div><span class="cl-status" data-module-count>0 registros</span></section>
+        <section class="module-filter-shell" aria-label="Filtros de búsqueda">
+            <form class="module-filter-form" data-search-form>
+                <div class="module-filter-field">
+                    <label for="module-search">Buscar registros</label>
+                    <input class="cl-input" id="module-search" type="search" placeholder="Buscar en esta tabla" autocomplete="off" data-search-input>
+                </div>
+                <button class="cl-button cl-button--primary" type="submit">Buscar</button>
+                <button class="cl-button cl-button--ghost" type="button" data-search-reset>Limpiar</button>
+            </form>
+            <p class="module-filter-help">La búsqueda consulta directamente la base de datos SQL del módulo.</p>
+        </section>
         <section class="module-table-shell"><div class="module-loading" data-table-status>Cargando registros...</div><div class="module-table-scroll"><table class="module-table"><thead data-table-head></thead><tbody data-table-body></tbody></table></div></section>
     </main>
     <script src="../js/module-table.js"></script>
